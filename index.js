@@ -12,6 +12,15 @@ server.use(morgan("dev"));
 server.use(express.json());
 server.use("/api", apiRouter);
 
+apiRouter.use((error, req, res, next) => {
+    res.send({
+      name: error.name,
+      message: error.message,
+    });
+  });
+
+// server.get()
+
 server.listen(PORT, () => {
     console.log("The server is up on port", PORT);
   });

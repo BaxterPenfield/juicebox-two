@@ -7,6 +7,7 @@ const { JWT_SECRET } = process.env;
 apiRouter.use(async (req, res, next) => {
   const prefix = "Bearer ";
   const auth = req.header("Authorization");
+//   console.log("Success", req.header)
 
   if (!auth) {
     next();
@@ -14,16 +15,19 @@ apiRouter.use(async (req, res, next) => {
     const token = auth.slice(prefix.length);
 
     try {
-      const { id } = jwt.verify(token, JWT_SECRET);
-
-      if (id) {
-        req.user = await getUserById(id);
+      const response = jwt.verify(token, JWT_SECRET);
+        // console.log("This is line 14 block", response)
+      if (response) {
+        //   console.log("This should hit getUserById")
+        req.user = await getUserById(response.id);
+        console.log(req.user)
         next();
       }
     } catch ({ name, message }) {
       next({ name, message });
     }
   } else {
+    //   console.log("This is line 27 block")
     next({
       name: "AuthorizationHeaderError",
       message: `Authorization token must start with ${prefix}`,
@@ -46,11 +50,6 @@ apiRouter.use("/users", usersRouter);
 apiRouter.use("/posts", postsRouter);
 apiRouter.use("/tags", tagsRouter);
 
-apiRouter.use((error, req, res, next) => {
-  res.send({
-    name: error.name,
-    message: error.message,
-  });
-});
+
 
 module.exports = apiRouter;
